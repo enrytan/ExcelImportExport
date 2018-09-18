@@ -1,4 +1,4 @@
-﻿@model ExcelImportExport.Models.ExcelUpload
+﻿@model List<ExcelImportExport.Models.ExcelUpload>
 
 @{
     ViewBag.Title = "Student Data Upload";
@@ -16,19 +16,14 @@
 <div class="box box-default">
     <div class="box-header with-border">
         <h3 class="box-title">Upload Data</h3>
-
-        <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-
-        </div>
     </div>
     <div class="box-body">
-        <form action="HouseDataUpload" method="post" enctype="multipart/form-data">
+        <form action="ExcelUpload" method="post" enctype="multipart/form-data">
             <div class="form-horizontal">
                 <div class="form-group">
                     <label for="file" class="control-label col-md-2">House Data File : </label>
                     <div class="col-md-6">
-                        <input type="file" accept=".csv" name="file" id="file" required="true" class="form-control btn btn-default" />
+                        <input type="file" accept=".xlsx" name="file" id="file" required="true" class="form-control btn btn-default" />
                     </div>
                 </div>
 
@@ -39,29 +34,28 @@
                 </div>
             </div>
         </form>
-
-        @*@if (Model.Validate.Count > 0)
-            {
-                <table class="table table-striped">
-                    <tr>
-                        <th>Row</th>
-                        <th>Column</th>
-                        <th>Description</th>
-                    </tr>
-                    @foreach (var item in Model.Validate)
-                    {
-                        <tr>
-                            <td>@item.row</td>
-                            <td>@item.column</td>
-                            <td>@item.description</td>
-                        </tr>
-                    }
-                </table>
-            }*@
-
-        @*@if (Model.Validate.Count > 0)
-            {*@
-
     </div>
+
+    @if (Model.Any())
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Student ID</th>
+                    <th scope="col">Student Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <th scope="row">@item.StudentId</th>
+                        <td>@item.StudentName</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    }
 </div>
 
