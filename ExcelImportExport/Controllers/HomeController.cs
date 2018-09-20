@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.IO;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.Drawing;
 
 namespace ExcelImportExport.Controllers
 {
@@ -34,7 +35,6 @@ namespace ExcelImportExport.Controllers
 
         public ActionResult ExcelUpload()
         {
-
             return View(new List<ExcelUpload>());
         }
 
@@ -163,6 +163,15 @@ namespace ExcelImportExport.Controllers
                     worksheet.Cells["A1:B" + row].Style.Border.Left.Style = ExcelBorderStyle.Thin;
                     worksheet.Cells["A1:B" + row].Style.Border.Right.Style = ExcelBorderStyle.DashDotDot;
                     worksheet.Cells["A1:B" + row].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+
+                    Image logo = Image.FromFile(Path.Combine(Server.MapPath("~/Content/"), "1.png"));
+
+                    //Below for resize the image
+                    
+
+                    var picture = worksheet.Drawings.AddPicture("imagename", logo);
+                    picture.SetPosition(13, 0, 0, 0);
+                    picture.SetSize(50);
 
                     byteArray = package.GetAsByteArray();
                 }
