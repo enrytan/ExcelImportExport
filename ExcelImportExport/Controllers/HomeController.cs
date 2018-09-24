@@ -137,51 +137,87 @@ namespace ExcelImportExport.Controllers
 
             byte[] byteArray;
 
+            bool editExcel = true;
+
+            
+
             using (MemoryStream mem = new MemoryStream())
             {
-                using (ExcelPackage package = new ExcelPackage(mem))
+                if (editExcel)
                 {
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Student Data");
-
-                    worksheet.Cells["A1"].Value = "Student ID";
-                    worksheet.Cells["B1"].Value = "Student Name";
-                    worksheet.Column(1).Width = 30;
-                    worksheet.Column(2).Width = 30;
-                    worksheet.Cells["A1:B1"].Style.Font.Bold = true;
-
-                    // To Add Named Range
-                    worksheet.Names.Add("testnamerange", worksheet.Cells["A1:B1"]);
-
-                    int row = 1;
-                    foreach(var item in dummylist)
+                    using (ExcelPackage package = new ExcelPackage())
                     {
-                        row++;
-                        worksheet.Cells["A" + row].Value = item.StudentId;
-                        worksheet.Cells["B" + row].Value = item.StudentName;
+                        using (FileStream stream = new FileStream(Path.Combine(Server.MapPath("~/Content/"), "ExcelDownload.xlsx"), FileMode.Open))
+                        {
+                            package.Load(stream);
+                           
+                            var worksheet = package.Workbook.Worksheets.SingleOrDefault(x => x.Name == "Student Data");
+                            if (worksheet == null) { package.Workbook.Worksheets.Add("Student Data"); }
+
+                            // to Delete Worksheet
+                            //package.Workbook.Worksheets.Delete(worksheet);
+
+                            // to move worksheet to the end
+                            package.Workbook.Worksheets.MoveToEnd("Student Data");
+
+                            int row = 1;
+                            foreach (var item in dummylist)
+                            {
+                                row++;
+                                worksheet.Cells["A" + row].Value = (item.StudentId + 1);
+                                worksheet.Cells["B" + row].Value = "edited " + worksheet.Cells["A" + row].Value + item.StudentName;
+                            }
+                        }
+                        byteArray = package.GetAsByteArray();
                     }
-
-                    row++;
-                    worksheet.Cells["A"+row+":B"+row].Merge = true;
-                    worksheet.Cells["A" + row + ":B" + row].Value = "END";
-                    worksheet.Cells["A" + row + ":B" + row].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-
-                    worksheet.Cells["A1:B" + row].Style.Border.Top.Style = ExcelBorderStyle.Thick;
-                    worksheet.Cells["A1:B" + row].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                    worksheet.Cells["A1:B" + row].Style.Border.Right.Style = ExcelBorderStyle.DashDotDot;
-                    worksheet.Cells["A1:B" + row].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
-
-                    Image logo = Image.FromFile(Path.Combine(Server.MapPath("~/Content/"), "1.png"));
-
-                    //Below for resize the image
-                    
-
-                    var picture = worksheet.Drawings.AddPicture("imagename", logo);
-                    picture.SetPosition(13, 0, 0, 0);
-                    picture.SetSize(50);
-                    //picture.SetSize(300,500);
-
-                    byteArray = package.GetAsByteArray();
                 }
+                else
+                {
+                    using (ExcelPackage package = new ExcelPackage(mem))
+                    {
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Student Data");
+
+                        worksheet.Cells["A1"].Value = "Student ID";
+                        worksheet.Cells["B1"].Value = "Student Name";
+                        worksheet.Column(1).Width = 30;
+                        worksheet.Column(2).Width = 30;
+                        worksheet.Cells["A1:B1"].Style.Font.Bold = true;
+
+                        // To Add Named Range
+                        worksheet.Names.Add("testnamerange", worksheet.Cells["A1:B1"]);
+
+                        int row = 1;
+                        foreach (var item in dummylist)
+                        {
+                            row++;
+                            worksheet.Cells["A" + row].Value = item.StudentId;
+                            worksheet.Cells["B" + row].Value = item.StudentName;
+                        }
+
+                        row++;
+                        worksheet.Cells["A" + row + ":B" + row].Merge = true;
+                        worksheet.Cells["A" + row + ":B" + row].Value = "END";
+                        worksheet.Cells["A" + row + ":B" + row].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                        worksheet.Cells["A1:B" + row].Style.Border.Top.Style = ExcelBorderStyle.Thick;
+                        worksheet.Cells["A1:B" + row].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                        worksheet.Cells["A1:B" + row].Style.Border.Right.Style = ExcelBorderStyle.DashDotDot;
+                        worksheet.Cells["A1:B" + row].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+
+                        Image logo = Image.FromFile(Path.Combine(Server.MapPath("~/Content/"), "1.png"));
+
+                        //Below for resize the image
+
+
+                        var picture = worksheet.Drawings.AddPicture("imagename", logo);
+                        picture.SetPosition(13, 0, 0, 0);
+                        picture.SetSize(50);
+                        //picture.SetSize(300,500);
+
+                        byteArray = package.GetAsByteArray();
+                    }
+                }
+                
             }
             
             return File(new MemoryStream(byteArray, 0, byteArray.Length), "application/octet-stream", "ExcelDownload.xlsx");
