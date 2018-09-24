@@ -83,6 +83,9 @@ namespace ExcelImportExport.Controllers
                     //Data from only a specific range of cells within a worksheet can be queried as well.
                     var excelContent = from a in excel.WorksheetRange<ExcelUpload>("A1","B12","Student Data")
                                     select a;
+
+                    //var excelContents = from a in excel.WorksheetRange<ExcelUpload>("D1", "E12")
+                    //                    select a;
                 }
             }
             else
@@ -146,6 +149,9 @@ namespace ExcelImportExport.Controllers
                     worksheet.Column(2).Width = 30;
                     worksheet.Cells["A1:B1"].Style.Font.Bold = true;
 
+                    // To Add Named Range
+                    worksheet.Names.Add("testnamerange", worksheet.Cells["A1:B1"]);
+
                     int row = 1;
                     foreach(var item in dummylist)
                     {
@@ -172,6 +178,7 @@ namespace ExcelImportExport.Controllers
                     var picture = worksheet.Drawings.AddPicture("imagename", logo);
                     picture.SetPosition(13, 0, 0, 0);
                     picture.SetSize(50);
+                    //picture.SetSize(300,500);
 
                     byteArray = package.GetAsByteArray();
                 }
